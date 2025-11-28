@@ -45,27 +45,76 @@ Use the trained model to predict  for a new input value .
 ### Register Number:
 
 ```python
-class Model(nn.Module):
-    def __init__(self, in_features, out_features):
-        super().__init__()
-        #Include your code here
+# Import necessary libraries
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Step 1: Generate Dataset
+np.random.seed(0)
+X = np.arange(1, 51).reshape(-1, 1)  # Inputs 1 to 50
+e = np.random.normal(0, 5, size=X.shape)  # Random noise
+y = 2 * X + 1 + e  # Output
 
+# Convert to PyTorch tensors
+X_train = torch.tensor(X, dtype=torch.float32)
+y_train = torch.tensor(y, dtype=torch.float32)
 
-# Initialize the Model, Loss Function, and Optimizer
+# Step 2: Define Neural Network Model
+class LinearRegressionNN(nn.Module):
+    def __init__(self):
+        super(LinearRegressionNN, self).__init__()
+        self.linear = nn.Linear(1, 1)  # Input 1, Output 1
+
+    def forward(self, x):
+        return self.linear(x)
+
+model = LinearRegressionNN()
+
+# Step 3: Define Loss Function and Optimizer
+criterion = nn.MSELoss()
+optimizer = optim.SGD(model.parameters(), lr=0.001)
+
+# Step 4: Train the Model
+epochs = 2000
+for epoch in range(epochs):
+    # Forward pass
+    outputs = model(X_train)
+    loss = criterion(outputs, y_train)
+
+    # Backward pass and optimization
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if (epoch+1) % 200 == 0:
+        print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
+
+# Step 5: Predict for x = 120
+x_test = torch.tensor([[120]], dtype=torch.float32)
+y_pred = model(x_test).item()
+print(f'Predicted output for x=120: {y_pred:.2f}')
+
+# Optional: Plot the fitted line
+plt.scatter(X, y, label='Data')
+plt.plot(X, model(X_train).detach().numpy(), color='red', label='Fitted Line')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.legend()
+plt.show()
+
 
 ```
-
-### Dataset Information
-Include screenshot of the generated data
 
 ### OUTPUT
 Training Loss Vs Iteration Plot
 Best Fit line plot
 Include your plot here
 
-### New Sample Data Prediction
-Include your sample input and output here
+<img width="799" height="856" alt="Screenshot 2025-11-28 183027" src="https://github.com/user-attachments/assets/b4577335-544b-43c5-800e-85745a7c8806" />
+
 
 ## RESULT
 Thus, a neural network regression model was successfully developed and trained using PyTorch.
